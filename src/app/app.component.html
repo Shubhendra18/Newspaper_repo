@@ -1,0 +1,71 @@
+<div class="reader-app">
+  <!-- Top Navigation/Header Bar -->
+  <header class="reader-header">
+    <div class="header-brand">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-newspaper me-2" viewBox="0 0 16 16">
+        <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5v-11zM12 14c.37 0 .654-.211.774-.506a.524.524 0 0 0-.026-.008L12 13.17V14zm0-1.802a.512.512 0 0 0-.25-.018L12 12.22v-.023c0-.129.026-.26.076-.366l.013-.024c.063-.122.14-.21.223-.264L12 11.522v.676zM11 11H3v1h8v-1zm0-2H3v1h8V9zm0-2H3v1h8V7zm0-2H3v1h8V5zm0-2H3v1h8V3z"/>
+      </svg>
+      <h1>NBT Reader</h1>
+    </div>
+    
+    <!-- Date Selection Bar (Auto-loads on change) -->
+    <div class="date-selector">
+      <input type="date" class="form-control form-control-dark" [(ngModel)]="newsdate" name="newsdate" (change)="postData(newsdate)">
+    </div>
+  </header>
+
+  <!-- Main Newspaper View Area -->
+  <main class="viewer-section">
+    <!-- Image Wrapper -->
+    <div class="image-scroller">
+      <img [src]="myThumbnail" 
+           [style.filter]="unblurLevel === 'sharp' ? 'url(#sharpen-mild) contrast(1.22) brightness(1.01) saturate(1.05)' : (unblurLevel === 'ultra' ? 'url(#sharpen-strong) contrast(1.3) brightness(1.02) saturate(1.08)' : 'none')"
+           (click)="onImageClick($event)"
+           class="newspaper-img"
+           alt="Newspaper Page">
+    </div>
+
+    <!-- Floating Glassmorphic Mobile Toolbar -->
+    <div class="viewer-toolbar">
+      <!-- Page Flip controls -->
+      <button class="btn-tool" (click)="Prev()" [disabled]="pageNumber <= 1" title="Previous Page">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+        </svg>
+      </button>
+      
+      <span class="page-indicator">Page {{ pageNumber }}</span>
+      
+      <button class="btn-tool" (click)="Next()" title="Next Page">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+        </svg>
+      </button>
+      
+      <div class="toolbar-divider"></div>
+
+      <!-- Toggle Readability / Unblur Enhancer -->
+      <button class="btn-tool btn-boost" [class.active-mild]="unblurLevel === 'sharp'" [class.active-strong]="unblurLevel === 'ultra'" (click)="cycleUnblur()" title="Cycle Unblur Mode (Off -> Mild -> Strong)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+          <path d="M8 13A5 5 0 1 1 8 3v10z"/>
+        </svg>
+        <span class="unblur-text">{{ unblurLevel === 'off' ? 'Off' : (unblurLevel === 'sharp' ? 'Mild' : 'Strong') }}</span>
+      </button>
+    </div>
+  </main>
+</div>
+
+<!-- Hardware-Accelerated SVG Sharpening Filters (Unblur Mechanism) -->
+<svg style="position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none;">
+  <defs>
+    <!-- Mild Sharpening Filter (enhances edge contrast) -->
+    <filter id="sharpen-mild">
+      <feConvolveMatrix order="3" kernelMatrix="0 -1 0 -1 5 -1 0 -1 0" preserveAlpha="true"/>
+    </filter>
+    <!-- Strong Sharpening Filter (aggressively defines pixelated character edges) -->
+    <filter id="sharpen-strong">
+      <feConvolveMatrix order="3" kernelMatrix="0 -2 0 -2 9 -2 0 -2 0" preserveAlpha="true"/>
+    </filter>
+  </defs>
+</svg>
